@@ -4,16 +4,28 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <title>Undangan Pernikahan Interaktif</title>
-    <!-- Tailwind CSS -->
+    <!-- Mode aplikasi penuh saat ditambahkan ke layar utama (Android & iOS) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#070d12" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
+      html,
+      body {
+        overscroll-behavior: none; /* cegah pull-to-refresh & bounce */
+        -webkit-tap-highlight-color: transparent;
+      }
       body {
         font-family: "Plus Jakarta Sans", sans-serif;
         background-color: #070d12;
@@ -82,6 +94,19 @@
           opacity: 1;
         }
       }
+      .app-open {
+        animation: appOpen 0.25s ease-out forwards;
+      }
+      @keyframes appOpen {
+        from {
+          opacity: 0;
+          transform: scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -107,11 +132,6 @@
         <span id="current-time">07:43</span>
         <div class="flex items-center space-x-2">
           <span>5G</span>
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.35C2.86 17.39 2 14.82 2 12 2 6.48 6.48 2 12 2s10 4.48 10 10c0 2.82-.86 5.39-2.35 7.35l-1.62-1.74C18.26 16.07 19 14.12 19 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.18.41 2.27 1.1 3.12l1.41-1.41C9.2 13.3 9 12.68 9 12c0-1.66 1.34-3 3-3s3 1.34 3 3c0 .68-.2 1.3-.51 1.71l1.41 1.41c.69-.85 1.1-1.94 1.1-3.12 0-2.76-2.24-5-5-5z"
-            />
-          </svg>
           <div
             class="w-5 h-2.5 border border-slate-400 rounded-sm p-0.5 flex items-center"
           >
@@ -120,7 +140,7 @@
         </div>
       </div>
 
-      <!-- LAYAR 1: LOCK SCREEN (Mendukung Geser ke Atas / Swipe Up) -->
+      <!-- LAYAR 1: LOCK SCREEN -->
       <div
         id="lock-screen"
         class="absolute inset-0 flex flex-col justify-between p-6 z-40 bg-cover bg-center select-none transition-all duration-500"
@@ -185,7 +205,7 @@
           </h2>
         </div>
 
-        <!-- Widget Ayat Al-Qur'an -->
+        <!-- Widget Ayat -->
         <div class="glass-panel p-4 rounded-2xl mb-6 shadow-md">
           <div class="flex items-center space-x-2 mb-1.5">
             <span
@@ -202,9 +222,9 @@
 
         <!-- Grid Aplikasi -->
         <div class="grid grid-cols-4 gap-4 text-center pb-8">
-          <!-- Chat App Button -->
+          <!-- Chat -->
           <div
-            onclick="openChatApp()"
+            onclick="openApp('chat')"
             class="flex flex-col items-center cursor-pointer group relative z-30"
           >
             <div
@@ -232,9 +252,38 @@
             <span class="text-xs text-slate-300 mt-1 font-medium">Chat</span>
           </div>
 
+          <!-- Kalender -->
+          <div
+            onclick="openApp('kalender')"
+            class="flex flex-col items-center cursor-pointer group z-30"
+          >
+            <div
+              id="icon-kalender"
+              class="w-14 h-14 bg-slate-800/80 border border-slate-700 rounded-2xl flex items-center justify-center shadow-lg relative opacity-60 transition"
+            >
+              <svg
+                class="w-6 h-6 text-slate-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"
+                />
+              </svg>
+              <span id="lock-kalender" class="absolute -top-1 -right-1 text-xs"
+                >🔒</span
+              >
+            </div>
+            <span class="text-xs text-slate-400 mt-1">Kalender</span>
+          </div>
+
           <!-- Undangan -->
           <div
-            onclick="openLockedApp()"
+            onclick="openApp('undangan')"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -263,7 +312,7 @@
 
           <!-- Galeri -->
           <div
-            onclick="openLockedApp()"
+            onclick="openApp('galeri')"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -292,7 +341,7 @@
 
           <!-- Maps -->
           <div
-            onclick="openLockedApp()"
+            onclick="openApp('maps')"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -327,10 +376,10 @@
         </div>
       </div>
 
-      <!-- BANNER NOTIFIKASI ATAS -->
+      <!-- BANNER NOTIFIKASI -->
       <div id="top-notification" class="absolute top-4 inset-x-4 z-50 hidden">
         <div
-          onclick="openChatApp()"
+          onclick="openApp('chat')"
           class="glass-panel p-3.5 rounded-2xl cursor-pointer shadow-2xl border-l-4 border-teal-500 notification-slide-down relative"
         >
           <div class="flex items-center justify-between mb-1">
@@ -344,7 +393,7 @@
             💍 Pengantin & <span id="guest-name-preview">Tamu Undangan</span>
           </p>
           <p class="text-[11px] text-slate-300 truncate mt-0.5">
-            "Halo! Ada kabar bahagia nih buat kamu..."
+            "Halo! Apa kabar? Lama nggak ngobrol nih..."
           </p>
           <button
             onclick="dismissNotification(event)"
@@ -356,19 +405,18 @@
         </div>
       </div>
 
-      <!-- LAYAR 3: APLIKASI CHAT INTERAKTIF
-           FIX: z-70 tidak ada di Tailwind -> pakai z-[70] -->
+      <!-- LAYAR 3: CHAT -->
       <div
         id="chat-app"
         class="absolute inset-0 bg-[#0b131a] z-[70] flex-col"
         style="display: none"
       >
         <div
-          class="bg-[#15202b] px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0"
+          class="bg-[#15202b] px-4 py-3 flex items-center border-b border-slate-800 shrink-0"
         >
           <div class="flex items-center space-x-3">
             <button
-              onclick="closeChat()"
+              onclick="history.back()"
               class="text-slate-400 hover:text-white p-1"
             >
               <svg
@@ -387,7 +435,7 @@
             </button>
             <div class="flex items-center space-x-2">
               <div
-                class="w-9 h-9 rounded-full bg-teal-700 flex items-center justify-center text-white font-bold text-xs overflow-hidden"
+                class="w-9 h-9 rounded-full bg-teal-700 flex items-center justify-center text-white text-sm"
               >
                 💍
               </div>
@@ -395,52 +443,163 @@
                 <h2 class="text-sm font-semibold text-white">
                   Grup Pernikahan Kita
                 </h2>
-                <p class="text-[10px] text-teal-400">
-                  Pengantin Pria, Pengantin Wanita, Tamu
-                </p>
+                <p id="chat-subtitle" class="text-[10px] text-teal-400"></p>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Ruang Pesan Chat -->
         <div
           id="chat-container"
           class="flex-1 p-4 overflow-y-auto space-y-3.5 flex flex-col"
         ></div>
-
-        <!-- Area Pilihan Teks -->
         <div
           id="choice-container"
-          class="p-3 bg-[#15202b] border-t border-slate-800 space-y-2 shrink-0"
+          class="p-3 bg-[#15202b] border-t border-slate-800 space-y-2 shrink-0 empty:hidden"
         ></div>
       </div>
 
-      <!-- POP-UP LOCKED ALERT (FIX: z-80 -> z-[80]) -->
+      <!-- LAYAR 4: KALENDER -->
+      <div
+        id="kalender-app"
+        class="absolute inset-0 bg-[#0b131a] z-[70] flex-col"
+        style="display: none"
+      >
+        <div
+          class="bg-[#15202b] px-4 py-3 flex items-center border-b border-slate-800 shrink-0"
+        >
+          <button
+            onclick="history.back()"
+            class="text-slate-400 hover:text-white p-1 mr-3"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h2 class="text-sm font-semibold text-white">Kalender</h2>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+          <!-- Navigasi bulan -->
+          <div class="flex items-center justify-between">
+            <button
+              onclick="changeMonth(-1)"
+              class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700"
+            >
+              ‹
+            </button>
+            <h3 id="cal-title" class="text-sm font-semibold text-white"></h3>
+            <button
+              onclick="changeMonth(1)"
+              class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700"
+            >
+              ›
+            </button>
+          </div>
+
+          <div>
+            <div
+              class="grid grid-cols-7 text-center text-[10px] text-slate-500 mb-1.5"
+            >
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span
+              ><span>Jum</span><span>Sab</span><span>Min</span>
+            </div>
+            <div
+              id="cal-grid"
+              class="grid grid-cols-7 gap-y-1 text-center text-xs"
+            ></div>
+          </div>
+
+          <!-- Kartu acara -->
+          <div class="glass-panel rounded-2xl p-4 border-l-4 border-teal-500">
+            <p
+              class="text-[10px] uppercase tracking-wider text-teal-400 font-semibold"
+            >
+              Hari Bahagia 💍
+            </p>
+            <h4 id="ev-date" class="text-sm font-bold text-white mt-1"></h4>
+            <p id="ev-count" class="text-xs text-teal-300 mt-0.5"></p>
+            <div class="mt-3 space-y-1.5 text-xs text-slate-300">
+              <p>🕗 Akad: <span id="ev-akad"></span></p>
+              <p>🍽️ Resepsi: <span id="ev-resepsi"></span></p>
+              <p>📍 <span id="ev-venue"></span></p>
+            </div>
+            <button
+              onclick="downloadICS()"
+              class="mt-4 w-full bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold py-2.5 rounded-xl transition"
+            >
+              📅 Simpan ke Kalender HP
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast peringatan terkunci -->
       <div
         id="locked-alert"
         class="absolute inset-x-4 top-16 bg-red-900/90 border border-red-700 text-white px-4 py-3 rounded-xl shadow-xl z-[80] transform -translate-y-24 opacity-0 transition-all duration-300 text-center text-xs pointer-events-none"
       >
-        ⚠️ Aplikasi ini masih terkunci! Selesaikan obrolan di chat terlebih
-        dahulu untuk membukanya.
+        🔒 Aplikasi ini belum terbuka. Selesaikan obrolan di Chat dulu ya!
+      </div>
+
+      <!-- Toast keluar -->
+      <div
+        id="exit-toast"
+        class="absolute bottom-10 inset-x-8 bg-slate-800/95 border border-slate-600 text-white px-4 py-2.5 rounded-full shadow-xl z-[90] opacity-0 transition-opacity duration-300 text-center text-xs pointer-events-none"
+      >
+        Geser sekali lagi untuk keluar
+      </div>
+
+      <!-- Layar keluar -->
+      <div
+        id="bye-screen"
+        class="absolute inset-0 bg-black z-[100] flex-col items-center justify-center text-center p-8"
+        style="display: none"
+      >
+        <p class="text-4xl mb-3">💍</p>
+        <p class="text-sm text-slate-300">Terima kasih sudah berkunjung.</p>
+        <p class="text-xs text-slate-500 mt-1">
+          Kamu bisa menutup halaman ini.
+        </p>
       </div>
     </div>
 
-    <!-- Script Utama -->
     <script>
+      /* ============ KONFIGURASI (ubah sesuai data asli) ============ */
+      const CONFIG = {
+        groom: "Qabil",
+        bride: "Aulia",
+        start: "2026-02-20T08:00:00+07:00",
+        end: "2026-02-20T13:00:00+07:00",
+        akad: "08:00 WIB",
+        resepsi: "11:00 – 13:00 WIB",
+        venue: "Lokasi lengkap menyusul di aplikasi Maps",
+      };
+      /* ============================================================= */
+
       const urlParams = new URLSearchParams(window.location.search);
-      // URLSearchParams sudah otomatis men-decode, jadi tidak perlu decodeURIComponent lagi
-      const guestName = urlParams.get("to") || "Sahabatku";
-
-      // Gunakan textContent supaya aman dari injeksi HTML lewat parameter ?to=
-      document.getElementById("guest-name-preview").textContent = guestName;
-      document.getElementById("owner-phone-title").textContent = guestName;
-
-      function escapeHtml(str) {
+      const guestName = urlParams.get("to") || "Wini dan Aiki";
+      const $ = (id) => document.getElementById(id);
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      const esc = (s) => {
         const d = document.createElement("div");
-        d.textContent = str;
+        d.textContent = s;
         return d.innerHTML;
-      }
+      };
+
+      $("guest-name-preview").textContent = guestName;
+      $("owner-phone-title").textContent = guestName;
+      $("chat-subtitle").textContent =
+        `${CONFIG.groom}, ${CONFIG.bride}, ${guestName}`;
 
       const avatars = {
         pria: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
@@ -449,14 +608,12 @@
         tamu: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop",
       };
 
+      /* ---------- Jam & tanggal ---------- */
       function updateTime() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        const timeString = `${hours}:${minutes}`;
-        document.getElementById("current-time").innerText = timeString;
-        document.getElementById("lock-clock").innerText = timeString;
-
+        const t = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        $("current-time").innerText = t;
+        $("lock-clock").innerText = t;
         const hari = [
           "Minggu",
           "Senin",
@@ -480,28 +637,171 @@
           "November",
           "Desember",
         ];
-        document.getElementById("lock-date").innerText =
+        $("lock-date").innerText =
           `${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]}`;
       }
       setInterval(updateTime, 1000);
       updateTime();
 
-      // Logika Geser ke Atas (Swipe Up) di Lock Screen
-      let startY = 0;
-      let isUnlocked = false;
+      /* ---------- FULLSCREEN ---------- */
+      function tryFullscreen() {
+        const el = document.documentElement;
+        const req =
+          el.requestFullscreen ||
+          el.webkitRequestFullscreen ||
+          el.msRequestFullscreen;
+        if (
+          !req ||
+          document.fullscreenElement ||
+          document.webkitFullscreenElement
+        )
+          return;
+        try {
+          const p = req.call(el, { navigationUI: "hide" });
+          if (p && p.catch) p.catch(() => {});
+        } catch (e) {}
+      }
+      // Browser mewajibkan fullscreen dipicu sentuhan pengguna -> pada sentuhan pertama
+      let fsTried = false;
+      ["touchend", "click"].forEach((ev) =>
+        document.addEventListener(
+          ev,
+          () => {
+            if (fsTried) return;
+            fsTried = true;
+            tryFullscreen();
+          },
+          { passive: true },
+        ),
+      );
 
+      /* ---------- NAVIGASI & GESTURE BACK ----------
+         Riwayat:  exit -> (lock | home) -> app
+         Back/gesture dari aplikasi  : kembali ke beranda
+         Back/gesture dari beranda   : 1x = peringatan, 2x (dalam 2 detik) = keluar */
+      let isUnlocked = false;
+      let exitArmed = false;
+      let exitTimer = null;
+
+      history.replaceState({ s: "exit" }, "");
+      history.pushState({ s: "lock" }, "");
+
+      function showApp(name) {
+        hideApps();
+        const el = $(name === "chat" ? "chat-app" : "kalender-app");
+        el.style.display = "flex";
+        el.classList.remove("app-open");
+        void el.offsetWidth;
+        el.classList.add("app-open");
+        if (name === "chat") startChat();
+        if (name === "kalender") renderCalendar();
+      }
+
+      function hideApps() {
+        $("chat-app").style.display = "none";
+        $("kalender-app").style.display = "none";
+      }
+
+      const unlocked = {
+        chat: true,
+        kalender: false,
+        undangan: false,
+        galeri: false,
+        maps: false,
+      };
+
+      function openApp(name) {
+        if (!unlocked[name]) return showLockedAlert();
+        if (name !== "chat" && name !== "kalender") return showLockedAlert();
+        $("chat-badge").classList.add("hidden");
+        $("top-notification").classList.add("hidden");
+        history.pushState({ s: name }, "");
+        showApp(name);
+      }
+
+      function unlockApp(name) {
+        unlocked[name] = true;
+        $("icon-" + name).classList.remove("opacity-60");
+        $("lock-" + name).style.display = "none";
+      }
+
+      window.addEventListener("popstate", (e) => {
+        const s = e.state && e.state.s;
+        if (s === "home") return hideApps();
+        if (s === "chat" || s === "kalender") return showApp(s); // tombol forward
+        // sampai di batas: beranda/lock -> logika keluar
+        if (exitArmed) return showBye();
+        exitArmed = true;
+        showToast("exit-toast");
+        history.pushState({ s: isUnlocked ? "home" : "lock" }, "");
+        hideApps();
+        clearTimeout(exitTimer);
+        exitTimer = setTimeout(() => {
+          exitArmed = false;
+          hideToast("exit-toast");
+        }, 2000);
+      });
+
+      function showBye() {
+        hideToast("exit-toast");
+        $("bye-screen").style.display = "flex";
+        try {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else if (document.webkitFullscreenElement)
+            document.webkitExitFullscreen();
+        } catch (e) {}
+        try {
+          window.close();
+        } catch (e) {}
+      }
+
+      function showToast(id) {
+        $(id).style.opacity = "1";
+      }
+      function hideToast(id) {
+        $(id).style.opacity = "0";
+      }
+
+      // Gesture swipe di dalam halaman (berguna saat fullscreen / iOS tanpa tombol back):
+      //  - geser dari tepi kiri ke kanan  = kembali
+      //  - geser ke atas dari tepi bawah  = kembali
+      const frame = $("phone-frame");
+      let gx = 0,
+        gy = 0,
+        gesturesActive = false;
+      frame.addEventListener(
+        "touchstart",
+        (e) => {
+          gx = e.touches[0].clientX;
+          gy = e.touches[0].clientY;
+          gesturesActive = isUnlocked; // abaikan swipe yang justru membuka lock screen
+        },
+        { passive: true },
+      );
+      frame.addEventListener(
+        "touchend",
+        (e) => {
+          if (!gesturesActive) return;
+          const t = e.changedTouches[0];
+          const dx = t.clientX - gx;
+          const dy = t.clientY - gy;
+          const r = frame.getBoundingClientRect();
+          const fromLeft = gx - r.left <= 30 && dx > 70 && Math.abs(dy) < 80;
+          const fromBottom =
+            r.bottom - gy <= 40 && dy < -70 && Math.abs(dx) < 80;
+          if (fromLeft || fromBottom) history.back();
+        },
+        { passive: true },
+      );
+
+      /* ---------- Lock screen ---------- */
+      let startY = 0;
       function handleTouchStart(e) {
         startY = e.touches[0].clientY;
       }
-
       function handleTouchEnd(e) {
-        let endY = e.changedTouches[0].clientY;
-        if (startY - endY > 30) {
-          unlockScreen();
-        }
+        if (startY - e.changedTouches[0].clientY > 30) unlockScreen();
       }
-
-      // Untuk uji coba di PC menggunakan Mouse (Drag ke atas atau klik)
       let startMouseY = 0;
       function handleMouseDown(e) {
         startMouseY = e.clientY;
@@ -510,278 +810,306 @@
         if (
           startMouseY - e.clientY > 30 ||
           Math.abs(startMouseY - e.clientY) <= 5
-        ) {
+        )
           unlockScreen();
-        }
       }
 
       function unlockScreen() {
         if (isUnlocked) return;
         isUnlocked = true;
+        tryFullscreen();
+        history.replaceState({ s: "home" }, "");
 
-        const lockScreen = document.getElementById("lock-screen");
+        const lockScreen = $("lock-screen");
         lockScreen.style.transform = "translateY(-100%)";
-
         setTimeout(() => {
           lockScreen.style.display = "none";
-
-          // Munculkan notifikasi setelah 2 detik berada di beranda
-          setTimeout(() => {
-            triggerIncomingNotification();
-          }, 2000);
+          setTimeout(triggerIncomingNotification, 2000);
         }, 500);
       }
 
       function triggerIncomingNotification() {
-        const notif = document.getElementById("top-notification");
-        const badge = document.getElementById("chat-badge");
-        if (notif) notif.classList.remove("hidden");
-        if (badge) badge.classList.remove("hidden");
+        $("top-notification").classList.remove("hidden");
+        $("chat-badge").classList.remove("hidden");
       }
-
       function dismissNotification(event) {
         event.stopPropagation();
-        const notif = document.getElementById("top-notification");
-        if (notif) notif.classList.add("hidden");
-      }
-
-      // Fungsi Membuka Aplikasi Chat
-      function openChatApp() {
-        const badge = document.getElementById("chat-badge");
-        if (badge) badge.classList.add("hidden");
-
-        const notif = document.getElementById("top-notification");
-        if (notif) notif.classList.add("hidden");
-
-        const chatApp = document.getElementById("chat-app");
-        chatApp.style.display = "flex"; // Tampilkan layar chat
-
-        if (chatStep === 0) {
-          startChatFlow();
-        }
-      }
-
-      function openLockedApp() {
-        // Jika sudah terbuka, jangan tampilkan peringatan terkunci
-        showLockedAlert();
-      }
-
-      function closeChat() {
-        const chatApp = document.getElementById("chat-app");
-        chatApp.style.display = "none"; // Sembunyikan kembali
+        $("top-notification").classList.add("hidden");
       }
 
       function showLockedAlert() {
-        const alertBox = document.getElementById("locked-alert");
-        alertBox.style.transform = "translateY(0)";
-        alertBox.style.opacity = "1";
+        const box = $("locked-alert");
+        box.style.transform = "translateY(0)";
+        box.style.opacity = "1";
         setTimeout(() => {
-          alertBox.style.transform = "translateY(-96px)";
-          alertBox.style.opacity = "0";
+          box.style.transform = "translateY(-96px)";
+          box.style.opacity = "0";
         }, 2500);
       }
 
-      let chatStep = 0;
-      const chatContainer = document.getElementById("chat-container");
-      const choiceContainer = document.getElementById("choice-container");
+      /* ---------- CHAT ---------- */
+      const chatContainer = $("chat-container");
+      const choiceContainer = $("choice-container");
+      const W = "👰 " + CONFIG.bride;
+      const P = "🤵 " + CONFIG.groom;
+      const weddingDateText = new Date(CONFIG.start).toLocaleDateString(
+        "id-ID",
+        {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "Asia/Jakarta",
+        },
+      );
+      const g = esc(guestName);
 
-      function appendMessage(sender, text, isMe = false, senderType = "pria") {
+      // from: "wanita" | "pria"  |  choice: pilihan balasan tamu
+      const script = [
+        { from: "wanita", text: `Halo ${g}! Apa kabar? 😊` },
+        {
+          from: "pria",
+          text: "Lama banget ya kita nggak ngobrol. Kangen nih!",
+        },
+        {
+          choice: [
+            "Alhamdulillah baik! Kalian gimana?",
+            "Baik dong! Tumben nih bikin grup begini 😆",
+          ],
+        },
+        {
+          from: "wanita",
+          text: "Alhamdulillah kami juga baik. Lagi sibuk-sibuknya, tapi seneng banget 🥰",
+        },
+        {
+          from: "pria",
+          text: "Sebenarnya ada kabar yang mau kami ceritain langsung ke kamu.",
+        },
+        {
+          choice: [
+            "Wah, kabar apa nih? Bikin penasaran!",
+            "Jangan-jangan... kabar bahagia ya? 👀",
+          ],
+        },
+        { from: "wanita", text: "Jadi... kami akan menikah! 💍" },
+        {
+          from: "pria",
+          text: "Setelah sekian lama bersama, akhirnya kami mantap melangkah ke jenjang yang lebih serius.",
+        },
+        {
+          choice: [
+            "MasyaAllah, selamat ya! Aku ikut seneng banget 🥹",
+            "Akhirnya!! Selamat buat kalian berdua 🎉",
+          ],
+        },
+        { from: "wanita", text: "Makasih banyak ya! Mohon doa restunya 🙏" },
+        { from: "pria", text: "Pasti kamu penasaran, kapan harinya?" },
+        { choice: ["Iya dong, kapan tanggalnya?"] },
+        {
+          from: "wanita",
+          text: `Harinya <b>${weddingDateText}</b>! Catat ya 📌`,
+        },
+        {
+          from: "pria",
+          text: "Biar nggak lupa, aku udah bukain akses <b>Kalender</b> di HP kamu. Coba cek di beranda, tanggalnya udah kami tandai 📅",
+          action: () => unlockApp("kalender"),
+        },
+        { choice: ["Siap, langsung aku cek! Pasti aku dateng 🤗"] },
+        {
+          from: "wanita",
+          text: "Yeay! Detail lokasi dan foto-foto menyusul ya, nanti kami kabari lagi 😉",
+        },
+        {
+          from: "pria",
+          text: `Makasih ya, ${g}. Sampai ketemu di hari bahagia kami! 🎉`,
+        },
+      ];
+
+      function appendMessage(sender, text, isMe = false, type = "pria") {
         const div = document.createElement("div");
         div.className = `flex items-end space-x-2 ${isMe ? "flex-row-reverse space-x-reverse" : "flex-row"} fade-in`;
-
-        let avatarImg = avatars.pria;
-        if (senderType === "wanita") avatarImg = avatars.wanita;
-        if (senderType === "tamu") avatarImg = avatars.tamu;
-
         div.innerHTML = `
-                <img src="${avatarImg}" class="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0" alt="Avatar">
-                <div class="flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[75%]">
-                    <span class="text-[10px] text-slate-400 mb-0.5 px-1">${sender}</span>
-                    <div class="p-3 rounded-2xl text-xs leading-relaxed ${isMe ? "chat-bubble-out text-white" : "chat-bubble-in text-slate-200"}">
-                        ${text}
-                    </div>
-                </div>
-            `;
+          <img src="${avatars[type]}" class="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0" alt="Avatar">
+          <div class="flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[75%]">
+            <span class="text-[10px] text-slate-400 mb-0.5 px-1">${sender}</span>
+            <div class="p-3 rounded-2xl text-xs leading-relaxed ${isMe ? "chat-bubble-out text-white" : "chat-bubble-in text-slate-200"}">${text}</div>
+          </div>`;
         chatContainer.appendChild(div);
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
 
-      function showTypingIndicator(sender, senderType = "pria") {
+      function showTyping(sender, type) {
         const div = document.createElement("div");
         div.id = "typing-indicator";
-        div.className = `flex items-end space-x-2 flex-row fade-in`;
-
-        let avatarImg = senderType === "wanita" ? avatars.wanita : avatars.pria;
-
+        div.className = "flex items-end space-x-2 flex-row fade-in";
         div.innerHTML = `
-                <img src="${avatarImg}" class="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0" alt="Avatar">
-                <div class="flex flex-col items-start max-w-[75%]">
-                    <span class="text-[10px] text-slate-400 mb-0.5 px-1">${sender} sedang mengetik...</span>
-                    <div class="p-3 rounded-2xl text-xs chat-bubble-in flex items-center space-x-1.5 h-8">
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                        <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
-                    </div>
-                </div>
-            `;
+          <img src="${avatars[type]}" class="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0" alt="Avatar">
+          <div class="flex flex-col items-start max-w-[75%]">
+            <span class="text-[10px] text-slate-400 mb-0.5 px-1">${sender} sedang mengetik...</span>
+            <div class="p-3 rounded-2xl text-xs chat-bubble-in flex items-center space-x-1.5 h-8">
+              <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+              <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+              <div class="w-2 h-2 bg-slate-400 rounded-full typing-dot"></div>
+            </div>
+          </div>`;
         chatContainer.appendChild(div);
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
-
-      function removeTypingIndicator() {
-        const indicator = document.getElementById("typing-indicator");
-        if (indicator) indicator.remove();
+      function removeTyping() {
+        const t = $("typing-indicator");
+        if (t) t.remove();
       }
 
-      function startChatFlow() {
-        if (chatStep > 0) return;
-        chatStep = 1;
-
-        setTimeout(() => {
-          showTypingIndicator("👰 Pengantin Wanita", "wanita");
-        }, 600);
-
-        setTimeout(() => {
-          removeTypingIndicator();
-          appendMessage(
-            "👰 Pengantin Wanita",
-            `Halo ${escapeHtml(guestName)}! Wah, akhirnya pesan ini terkirim juga ke HP kamu. 😊`,
-            false,
-            "wanita",
-          );
-        }, 2200);
-
-        setTimeout(() => {
-          showTypingIndicator("🤵 Pengantin Pria", "pria");
-        }, 3000);
-
-        setTimeout(() => {
-          removeTypingIndicator();
-          appendMessage(
-            "🤵 Pengantin Pria",
-            "Halo kak! Kami ada kabar penting nih mau disebar khusus buat kamu.",
-            false,
-            "pria",
-          );
-        }, 4600);
-
-        setTimeout(() => {
-          showChoices([
-            { text: "Wah, kabar apa nih? Bikin penasaran aja!", next: 2 },
-            { text: "Halo juga! Wah jangan bilang kalau...", next: 2 },
-          ]);
-        }, 5000);
-      }
-
-      function showChoices(choices) {
-        choiceContainer.innerHTML = "";
-        choices.forEach((c) => {
-          const btn = document.createElement("button");
-          btn.className =
-            "w-full text-left bg-[#1e293b] hover:bg-teal-900/40 border border-slate-700 text-xs text-teal-300 p-2.5 rounded-xl transition font-medium";
-          btn.innerText = `➤ ${c.text}`;
-          btn.onclick = () => handleChoice(c.text, c.next);
-          choiceContainer.appendChild(btn);
+      function waitChoice(options) {
+        return new Promise((resolve) => {
+          choiceContainer.innerHTML = "";
+          options.forEach((text) => {
+            const btn = document.createElement("button");
+            btn.className =
+              "w-full text-left bg-[#1e293b] hover:bg-teal-900/40 border border-slate-700 text-xs text-teal-300 p-2.5 rounded-xl transition font-medium";
+            btn.textContent = `➤ ${text}`;
+            btn.onclick = () => {
+              choiceContainer.innerHTML = "";
+              resolve(text);
+            };
+            choiceContainer.appendChild(btn);
+          });
         });
       }
 
-      let unlockedApps = { undangan: false, galeri: false, maps: false };
-
-      function handleChoice(selectedText, nextStep) {
-        choiceContainer.innerHTML = "";
-        appendMessage(
-          escapeHtml(guestName),
-          escapeHtml(selectedText),
-          true,
-          "tamu",
-        );
-
-        if (nextStep === 2) {
-          setTimeout(() => {
-            showTypingIndicator("👰 Pengantin Wanita", "wanita");
-          }, 800);
-
-          setTimeout(() => {
-            removeTypingIndicator();
-            appendMessage(
-              "👰 Pengantin Wanita",
-              "Hehe, iya betul! Kami mau mengundang kamu secara resmi di acara pernikahan kami. Mohon doa restunya ya! 🙏✨",
-              false,
-              "wanita",
-            );
-          }, 2600);
-
-          setTimeout(() => {
-            showTypingIndicator("🤵 Pengantin Pria", "pria");
-          }, 3400);
-
-          setTimeout(() => {
-            removeTypingIndicator();
-            // FIX: **teks** tidak dirender di innerHTML -> pakai <b>
-            appendMessage(
-              "🤵 Pengantin Pria",
-              "Nah, buat detail rincian acaranya, aku udah bukain akses <b>Aplikasi Undangan</b> di HP kamu ya. Coba dicek beranda!",
-              false,
-              "pria",
-            );
-
-            unlockedApps.undangan = true;
-            document
-              .getElementById("icon-undangan")
-              .classList.remove("opacity-60");
-            document.getElementById("lock-undangan").style.display = "none";
-          }, 5200);
-
-          setTimeout(() => {
-            showChoices([
-              {
-                text: "Alhamdulillah! Pasti aku dateng. Lancar-lancar ya persiapannya!",
-                next: 3,
-              },
-            ]);
-          }, 5800);
-        } else if (nextStep === 3) {
-          setTimeout(() => {
-            showTypingIndicator("👰 Pengantin Wanita", "wanita");
-          }, 800);
-
-          setTimeout(() => {
-            removeTypingIndicator();
-            appendMessage(
-              "👰 Pengantin Wanita",
-              "Siap-siap juga nanti aku bagiin foto-foto prewed kita di menu <b>Galeri</b> ya! 😉📸",
-              false,
-              "wanita",
-            );
-
-            unlockedApps.galeri = true;
-            unlockedApps.maps = true;
-            document
-              .getElementById("icon-galeri")
-              .classList.remove("opacity-60");
-            document.getElementById("lock-galeri").style.display = "none";
-            document.getElementById("icon-maps").classList.remove("opacity-60");
-            document.getElementById("lock-maps").style.display = "none";
-          }, 2600);
-
-          setTimeout(() => {
-            showTypingIndicator("🤵 Pengantin Pria", "pria");
-          }, 3400);
-
-          setTimeout(() => {
-            removeTypingIndicator();
-            appendMessage(
-              "🤵 Pengantin Pria",
-              "Makasih banyak responnya, " +
-                escapeHtml(guestName) +
-                "! Ditunggu kehadiran dan doa restunya ya. 🎉",
-              false,
-              "pria",
-            );
-            choiceContainer.innerHTML =
-              '<p class="text-center text-[11px] text-teal-400 py-1">✨ Obrolan selesai. Silakan cek aplikasi lain yang sudah terbuka di beranda!</p>';
-          }, 5200);
+      let chatStarted = false;
+      async function startChat() {
+        if (chatStarted) return;
+        chatStarted = true;
+        await sleep(500);
+        for (const step of script) {
+          if (step.choice) {
+            const picked = await waitChoice(step.choice);
+            appendMessage(g, esc(picked), true, "tamu");
+            await sleep(500);
+          } else {
+            const sender = step.from === "wanita" ? W : P;
+            showTyping(sender, step.from);
+            await sleep(800 + Math.min(step.text.length * 16, 1500));
+            removeTyping();
+            appendMessage(sender, step.text, false, step.from);
+            if (step.action) step.action();
+            await sleep(450);
+          }
         }
+        choiceContainer.innerHTML =
+          '<p class="text-center text-[11px] text-teal-400 py-1">✨ Obrolan selesai. Aplikasi Kalender sudah terbuka di beranda!</p>';
+      }
+
+      /* ---------- KALENDER ---------- */
+      const BULAN = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ];
+      const wy = +CONFIG.start.slice(0, 4);
+      const wm = +CONFIG.start.slice(5, 7) - 1;
+      const wd = +CONFIG.start.slice(8, 10);
+      let calYear = wy,
+        calMonth = wm;
+
+      function changeMonth(delta) {
+        calMonth += delta;
+        if (calMonth < 0) {
+          calMonth = 11;
+          calYear--;
+        }
+        if (calMonth > 11) {
+          calMonth = 0;
+          calYear++;
+        }
+        renderCalendar();
+      }
+
+      function renderCalendar() {
+        $("cal-title").textContent = `${BULAN[calMonth]} ${calYear}`;
+        const grid = $("cal-grid");
+        grid.innerHTML = "";
+        const offset = (new Date(calYear, calMonth, 1).getDay() + 6) % 7; // Senin = 0
+        const days = new Date(calYear, calMonth + 1, 0).getDate();
+        for (let i = 0; i < offset; i++)
+          grid.appendChild(document.createElement("span"));
+        const now = new Date();
+        for (let d = 1; d <= days; d++) {
+          const cell = document.createElement("div");
+          const isWedding = calYear === wy && calMonth === wm && d === wd;
+          const isToday =
+            calYear === now.getFullYear() &&
+            calMonth === now.getMonth() &&
+            d === now.getDate();
+          cell.className =
+            "mx-auto w-8 h-8 flex items-center justify-center rounded-full text-slate-300";
+          if (isToday) cell.className += " border border-slate-500";
+          if (isWedding) {
+            cell.className =
+              "mx-auto w-8 h-8 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold ring-2 ring-teal-300/40";
+            cell.textContent = "💍";
+          } else {
+            cell.textContent = d;
+          }
+          grid.appendChild(cell);
+        }
+
+        $("ev-date").textContent = weddingDateText;
+        $("ev-akad").textContent = CONFIG.akad;
+        $("ev-resepsi").textContent = CONFIG.resepsi;
+        $("ev-venue").textContent = CONFIG.venue;
+        const diff = Math.ceil(
+          (new Date(CONFIG.start) - new Date()) / 86400000,
+        );
+        $("ev-count").textContent =
+          diff > 0
+            ? `${diff} hari lagi`
+            : diff === 0
+              ? "Hari ini! 🎉"
+              : "Acara sudah berlalu";
+      }
+
+      function downloadICS() {
+        const fmt = (s) =>
+          new Date(s)
+            .toISOString()
+            .replace(/[-:]/g, "")
+            .replace(/\.\d{3}/, "");
+        const ics = [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "PRODID:-//Undangan Pernikahan//ID",
+          "BEGIN:VEVENT",
+          `UID:${Date.now()}@undangan`,
+          `DTSTAMP:${fmt(new Date())}`,
+          `DTSTART:${fmt(CONFIG.start)}`,
+          `DTEND:${fmt(CONFIG.end)}`,
+          `SUMMARY:Pernikahan ${CONFIG.groom} & ${CONFIG.bride}`,
+          `LOCATION:${CONFIG.venue}`,
+          `DESCRIPTION:Akad ${CONFIG.akad}. Resepsi ${CONFIG.resepsi}.`,
+          "END:VEVENT",
+          "END:VCALENDAR",
+        ].join("\r\n");
+        const url = URL.createObjectURL(
+          new Blob([ics], { type: "text/calendar" }),
+        );
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "pernikahan.ics";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
     </script>
   </body>
