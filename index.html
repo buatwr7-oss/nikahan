@@ -115,15 +115,15 @@
           <div
             class="w-5 h-2.5 border border-slate-400 rounded-sm p-0.5 flex items-center"
           >
-            <div class="h-full w-3/4 bg-slate-400 rounded-2xs"></div>
+            <div class="h-full w-3/4 bg-slate-400 rounded-sm"></div>
           </div>
         </div>
       </div>
 
-      <!-- LAYAR 1: LOCK SCREEN MURNI -->
+      <!-- LAYAR 1: LOCK SCREEN (Mendukung Geser ke Atas / Swipe Up) -->
       <div
         id="lock-screen"
-        class="absolute inset-0 flex flex-col justify-between p-6 z-40 bg-cover bg-center cursor-pointer select-none transition-all duration-500"
+        class="absolute inset-0 flex flex-col justify-between p-6 z-40 bg-cover bg-center select-none transition-all duration-500"
         style="
           background-image:
             linear-gradient(
@@ -133,7 +133,6 @@
             ),
             url(&quot;https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop&quot;);
         "
-        onclick="unlockScreen()"
       >
         <div class="text-center mt-16 pointer-events-none">
           <h1
@@ -147,10 +146,16 @@
           </p>
         </div>
 
-        <div class="text-center mb-12 pointer-events-none">
+        <div
+          class="text-center mb-12 cursor-pointer"
+          ontouchstart="handleTouchStart(event)"
+          ontouchend="handleTouchEnd(event)"
+          onmousedown="handleMouseDown(event)"
+          onmouseup="handleMouseUp(event)"
+        >
           <div class="w-12 h-1 bg-slate-400/50 rounded-full mx-auto mb-2"></div>
           <p class="text-xs text-slate-400 animate-pulse">
-            Ketuk atau geser untuk membuka kunci
+            Geser ke atas untuk membuka kunci
           </p>
         </div>
       </div>
@@ -197,7 +202,7 @@
 
         <!-- Grid Aplikasi -->
         <div class="grid grid-cols-4 gap-4 text-center pb-8">
-          <!-- Chat App Button (Langsung Eksekusi Fungsi) -->
+          <!-- Chat App Button -->
           <div
             onclick="openChatApp()"
             class="flex flex-col items-center cursor-pointer group relative z-30"
@@ -229,7 +234,7 @@
 
           <!-- Undangan -->
           <div
-            onclick="openApp('undangan')"
+            onclick="openLockedApp()"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -258,7 +263,7 @@
 
           <!-- Galeri -->
           <div
-            onclick="openApp('galeri')"
+            onclick="openLockedApp()"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -287,7 +292,7 @@
 
           <!-- Maps -->
           <div
-            onclick="openApp('maps')"
+            onclick="openLockedApp()"
             class="flex flex-col items-center cursor-pointer group z-30"
           >
             <div
@@ -323,10 +328,7 @@
       </div>
 
       <!-- BANNER NOTIFIKASI ATAS -->
-      <div
-        id="top-notification"
-        class="absolute top-4 inset-x-4 z-50 hidden pointer-events-auto"
-      >
+      <div id="top-notification" class="absolute top-4 inset-x-4 z-50 hidden">
         <div
           onclick="openChatApp()"
           class="glass-panel p-3.5 rounded-2xl cursor-pointer shadow-2xl border-l-4 border-teal-500 notification-slide-down relative"
@@ -336,7 +338,7 @@
               class="text-[11px] font-semibold text-teal-400 uppercase tracking-wider"
               >💬 Pesan Baru • Grup Undangan</span
             >
-            <span class="text-[10px] text-slate-400">Baru saja</span>
+            <span class="text-[10px] text-slate-400 mr-5">Baru saja</span>
           </div>
           <p class="text-xs font-medium text-white">
             💍 Pengantin & <span id="guest-name-preview">Tamu Undangan</span>
@@ -354,10 +356,12 @@
         </div>
       </div>
 
-      <!-- LAYAR 3: APLIKASI CHAT INTERAKTIF (Z-Index Tinggi & Pointer Events Aktif) -->
+      <!-- LAYAR 3: APLIKASI CHAT INTERAKTIF
+           FIX: z-70 tidak ada di Tailwind -> pakai z-[70] -->
       <div
         id="chat-app"
-        class="absolute inset-0 bg-[#0b131a] z-70 flex flex-col transition-transform duration-300 transform translate-y-full pointer-events-auto"
+        class="absolute inset-0 bg-[#0b131a] z-[70] flex-col"
+        style="display: none"
       >
         <div
           class="bg-[#15202b] px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0"
@@ -412,10 +416,10 @@
         ></div>
       </div>
 
-      <!-- POP-UP LOCKED ALERT -->
+      <!-- POP-UP LOCKED ALERT (FIX: z-80 -> z-[80]) -->
       <div
         id="locked-alert"
-        class="absolute inset-x-4 top-16 bg-red-900/90 border border-red-700 text-white px-4 py-3 rounded-xl shadow-xl z-80 transform -translate-y-24 opacity-0 transition-all duration-300 text-center text-xs pointer-events-none"
+        class="absolute inset-x-4 top-16 bg-red-900/90 border border-red-700 text-white px-4 py-3 rounded-xl shadow-xl z-[80] transform -translate-y-24 opacity-0 transition-all duration-300 text-center text-xs pointer-events-none"
       >
         ⚠️ Aplikasi ini masih terkunci! Selesaikan obrolan di chat terlebih
         dahulu untuk membukanya.
@@ -425,12 +429,18 @@
     <!-- Script Utama -->
     <script>
       const urlParams = new URLSearchParams(window.location.search);
-      const guestName = urlParams.get("to")
-        ? decodeURIComponent(urlParams.get("to"))
-        : "Sahabatku";
+      // URLSearchParams sudah otomatis men-decode, jadi tidak perlu decodeURIComponent lagi
+      const guestName = urlParams.get("to") || "Sahabatku";
 
-      document.getElementById("guest-name-preview").innerText = guestName;
-      document.getElementById("owner-phone-title").innerText = guestName;
+      // Gunakan textContent supaya aman dari injeksi HTML lewat parameter ?to=
+      document.getElementById("guest-name-preview").textContent = guestName;
+      document.getElementById("owner-phone-title").textContent = guestName;
+
+      function escapeHtml(str) {
+        const d = document.createElement("div");
+        d.textContent = str;
+        return d.innerHTML;
+      }
 
       const avatars = {
         pria: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
@@ -446,17 +456,71 @@
         const timeString = `${hours}:${minutes}`;
         document.getElementById("current-time").innerText = timeString;
         document.getElementById("lock-clock").innerText = timeString;
+
+        const hari = [
+          "Minggu",
+          "Senin",
+          "Selasa",
+          "Rabu",
+          "Kamis",
+          "Jumat",
+          "Sabtu",
+        ];
+        const bulan = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+        document.getElementById("lock-date").innerText =
+          `${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]}`;
       }
       setInterval(updateTime, 1000);
       updateTime();
 
+      // Logika Geser ke Atas (Swipe Up) di Lock Screen
+      let startY = 0;
       let isUnlocked = false;
+
+      function handleTouchStart(e) {
+        startY = e.touches[0].clientY;
+      }
+
+      function handleTouchEnd(e) {
+        let endY = e.changedTouches[0].clientY;
+        if (startY - endY > 30) {
+          unlockScreen();
+        }
+      }
+
+      // Untuk uji coba di PC menggunakan Mouse (Drag ke atas atau klik)
+      let startMouseY = 0;
+      function handleMouseDown(e) {
+        startMouseY = e.clientY;
+      }
+      function handleMouseUp(e) {
+        if (
+          startMouseY - e.clientY > 30 ||
+          Math.abs(startMouseY - e.clientY) <= 5
+        ) {
+          unlockScreen();
+        }
+      }
+
       function unlockScreen() {
         if (isUnlocked) return;
         isUnlocked = true;
 
         const lockScreen = document.getElementById("lock-screen");
-        lockScreen.style.transform = "translateY(-100% )";
+        lockScreen.style.transform = "translateY(-100%)";
 
         setTimeout(() => {
           lockScreen.style.display = "none";
@@ -465,7 +529,7 @@
           setTimeout(() => {
             triggerIncomingNotification();
           }, 2000);
-        }, 400);
+        }, 500);
       }
 
       function triggerIncomingNotification() {
@@ -481,7 +545,7 @@
         if (notif) notif.classList.add("hidden");
       }
 
-      // Fungsi Khusus Membuka Aplikasi Chat Langsung ke Target
+      // Fungsi Membuka Aplikasi Chat
       function openChatApp() {
         const badge = document.getElementById("chat-badge");
         if (badge) badge.classList.add("hidden");
@@ -490,28 +554,21 @@
         if (notif) notif.classList.add("hidden");
 
         const chatApp = document.getElementById("chat-app");
-        chatApp.style.transform = "translateY(0)";
+        chatApp.style.display = "flex"; // Tampilkan layar chat
 
         if (chatStep === 0) {
           startChatFlow();
         }
       }
 
-      function openApp(appName) {
-        if (appName === "chat") {
-          openChatApp();
-        } else {
-          if (unlockedApps[appName]) {
-            alert("Membuka aplikasi " + appName);
-          } else {
-            showLockedAlert();
-          }
-        }
+      function openLockedApp() {
+        // Jika sudah terbuka, jangan tampilkan peringatan terkunci
+        showLockedAlert();
       }
 
       function closeChat() {
         const chatApp = document.getElementById("chat-app");
-        chatApp.style.transform = "translateY(100%)";
+        chatApp.style.display = "none"; // Sembunyikan kembali
       }
 
       function showLockedAlert() {
@@ -588,7 +645,7 @@
           removeTypingIndicator();
           appendMessage(
             "👰 Pengantin Wanita",
-            `Halo ${guestName}! Wah, akhirnya pesan ini terkirim juga ke HP kamu. 😊`,
+            `Halo ${escapeHtml(guestName)}! Wah, akhirnya pesan ini terkirim juga ke HP kamu. 😊`,
             false,
             "wanita",
           );
@@ -628,11 +685,16 @@
         });
       }
 
+      let unlockedApps = { undangan: false, galeri: false, maps: false };
+
       function handleChoice(selectedText, nextStep) {
         choiceContainer.innerHTML = "";
-        appendMessage(guestName, selectedText, true, "tamu");
-
-        let unlockedApps = { undangan: false, galeri: false, maps: false };
+        appendMessage(
+          escapeHtml(guestName),
+          escapeHtml(selectedText),
+          true,
+          "tamu",
+        );
 
         if (nextStep === 2) {
           setTimeout(() => {
@@ -655,9 +717,10 @@
 
           setTimeout(() => {
             removeTypingIndicator();
+            // FIX: **teks** tidak dirender di innerHTML -> pakai <b>
             appendMessage(
               "🤵 Pengantin Pria",
-              "Nah, buat detail rincian acaranya, aku udah bukain akses **Aplikasi Undangan** di HP kamu ya. Coba dicek beranda!",
+              "Nah, buat detail rincian acaranya, aku udah bukain akses <b>Aplikasi Undangan</b> di HP kamu ya. Coba dicek beranda!",
               false,
               "pria",
             );
@@ -686,7 +749,7 @@
             removeTypingIndicator();
             appendMessage(
               "👰 Pengantin Wanita",
-              "Siap-siap juga nanti aku bagiin foto-foto prewed kita di menu **Galeri** ya! 😉📸",
+              "Siap-siap juga nanti aku bagiin foto-foto prewed kita di menu <b>Galeri</b> ya! 😉📸",
               false,
               "wanita",
             );
@@ -710,7 +773,7 @@
             appendMessage(
               "🤵 Pengantin Pria",
               "Makasih banyak responnya, " +
-                guestName +
+                escapeHtml(guestName) +
                 "! Ditunggu kehadiran dan doa restunya ya. 🎉",
               false,
               "pria",
